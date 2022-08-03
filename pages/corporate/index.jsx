@@ -1,52 +1,41 @@
 import Head from 'next/head'
-import React, { useState, useLayoutEffect } from 'react';
+// import React, { useState, useLayoutEffect } from 'react';
 import Link from 'next/link';
 import Helmet from "react-helmet";
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import styles from '../../style/index.module.scss';
 
-export default function Home() {
-  //API呼び出し
-  const [data, setData] = useState([]);
-  useLayoutEffect(() => {
-    fetch('https://www.next-doorrr.com/knowledge-box/wp-json/wp/v2/posts')
-      .then(res => res.json())
-      .then(json => setData(json));
+//HTML
+const Home = (props) => (
+  <div className="container">
+    <Helmet>
+      <title>Create Next App</title>
+      <link rel="icon" href="/favicon.ico" />
+    </Helmet>
+    <Header />
+    <main className={styles.main}>
+      <p className="description">
+        コーポレートトップです。
+      </p>
+      <div className="grid">
 
-  }, []);
-  console.log(data);
-  return (
-    <div className="container">
-      <Helmet>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Helmet>
-      <Header />
-      <main className={styles.main}>
-        <p className="description">
-          コーポレートトップです。
-        </p>
+        {props.data.map((data) => {
+          return (
+            <Link href={"/corporate/" + data.slug} >
+              <a className="card">
+                <h3>{data.title.rendered}</h3>
+                <p>wordpress埋め込みイメージテスト</p>
+              </a>
+            </Link>
+          );
+        })}
+      </div>
+    </main >
 
-        <div className="grid">
-          {//コーポレート下に記事一覧を表示させる
+    <Footer />
 
-            data.map((data) => {
-              return (
-                <Link href={"/corporate/" + data.slug} >
-                  <a className="card">
-                    <h3>{data.title.rendered}</h3>
-                    <p>wordpress埋め込みイメージテスト</p>
-                  </a>
-                </Link>
-              );
-            })}
-        </div>
-      </main >
-
-      <Footer />
-
-      <style jsx>{`
+    <style jsx>{`
         .container {
           min-height: 100vh;
           padding: 0 0.5rem;
@@ -176,8 +165,18 @@ export default function Home() {
           }
         }
       `}</style>
+  </div>
+);
 
+//API呼び出し
+Home.getInitialProps = async function () {
+  const res = await fetch(
+    "https://www.next-doorrr.com/knowledge-box/wp-json/wp/v2/posts"
+  );
+  const data = await res.json();
 
-    </div >
-  )
-}
+  return {
+    data: data,
+  };
+};
+export default Home;
